@@ -1,0 +1,11 @@
+import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { Screen, layout } from '@/components/layout/Screen';
+import { Button, Note, ui } from '@/components/ui/Primitives';
+import { useSupport } from '@/hooks/useSupport';
+import { theme as t } from '@/constants/theme';
+export default function SupportPage() {
+  const p = useSupport();
+  return <Screen detail><ScrollView style={layout.list} contentContainerStyle={[layout.content, s.content]} showsVerticalScrollIndicator={false}><View style={s.hero}><Ionicons name="help-circle-outline" size={28} color={t.colors.primary}/><Text style={ui.heading}>A little help for your orchard.</Text><Text style={ui.body}>Questions about weekly recipes, membership or your data?</Text></View>{p.information ? <View style={ui.card}><Text style={s.heading}>{p.information.legalName}</Text><Text selectable style={ui.body}>{p.information.supportEmail}</Text><Button secondary title="Email support" onPress={p.email}/></View> : <Text accessibilityRole="alert" style={s.error}>{p.error || 'Loading support information…'}</Text>}<Button secondary title="Privacy policy" onPress={p.privacy}/><Button secondary title="Subscription terms" onPress={p.terms}/><Button secondary title="Delete my account" onPress={p.deletion}/>{p.information ? <View style={ui.gap}><Text style={s.heading}>Public information</Text><Button secondary title="Open public privacy policy" onPress={() => { void p.open(p.information?.privacyUrl); }}/><Button secondary title="Open public account-deletion page" onPress={() => { void p.open(p.information?.deletionUrl); }}/></View> : null}<Note text="For cancellation or refund requests, use your Apple or Google subscription settings. Recipes are educational guidance, not individualized medical advice."/></ScrollView></Screen>;
+}
+const s = StyleSheet.create({ content: { paddingTop: t.space.lg }, hero: { padding: t.space.lg, backgroundColor: t.colors.soft, borderRadius: t.radius.md, gap: t.space.md }, heading: { fontFamily: t.fonts.heading, fontSize: 22, lineHeight: 30, color: t.colors.primary }, error: { fontFamily: t.fonts.body, fontSize: 16, lineHeight: 26, color: t.colors.danger } });

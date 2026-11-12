@@ -1,0 +1,30 @@
+name: Public release deployment checks
+on:
+  workflow_dispatch:
+    inputs:
+      require_ready:
+        description: Require current reviewed live meals and approved new purchases (final launch only)
+        type: boolean
+        default: false
+permissions:
+  contents: read
+jobs:
+  public-pages:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check deployed public pages and anonymous recipe denial without payment APIs
+        env:
+          ORCHARD_PUBLIC_ANON_KEY: ${{ vars.ORCHARD_PUBLIC_ANON_KEY }}
+          REQUIRE_READY: ${{ inputs.require_ready }}
+        run: |
+          if [ "$REQUIRE_READY" = "true" ]; then
+            node scripts/release-smoke.cjs --require-ready
+          else
+            node scripts/release-smoke.cjs
+          fi
+# Only a public anon key, if required by the gateway. Never add payment or service-role secrets here.

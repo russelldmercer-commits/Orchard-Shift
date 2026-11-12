@@ -1,0 +1,36 @@
+[functions.app-check-subscription]
+verify_jwt = true
+
+[functions.app-create-checkout]
+verify_jwt = true
+
+[functions.app-customer-portal]
+verify_jwt = true
+
+# Private read-only invoices, scoped to the authenticated APP customer mapping.
+[functions.app-payment-history]
+verify_jwt = true
+
+# Public SDK key only; independently authenticated with a verified-email account.
+[functions.app-native-config]
+verify_jwt = true
+
+# Secret-key server verification; no client-selected account or receipt is accepted.
+[functions.app-native-subscription]
+verify_jwt = true
+
+# Availability is public; paid reads independently verify the caller's JWT and entitlement.
+[functions.app-weekly-meals]
+verify_jwt = false
+
+# Deletion verifies JWT plus a fresh password; accepts no caller-selected identity.
+[functions.app-delete-account]
+verify_jwt = true
+
+# Public HTTPS policies and password-verified deletion form; never returns credentials.
+[functions.app-public-information]
+verify_jwt = false
+
+# Public, read-only HTTPS return page. It cannot verify or unlock membership.
+[functions.app-billing-return]
+verify_jwt = false

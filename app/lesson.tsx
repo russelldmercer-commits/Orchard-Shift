@@ -1,0 +1,12 @@
+import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
+import { Check, BookOpen, PencilLine } from 'lucide-react-native';
+import { Screen, layout } from '@/components/layout/Screen';
+import { Field, Button, Note, ui } from '@/components/ui/Primitives';
+import { useLessons } from '@/hooks/useLessons';
+import { theme as t } from '@/constants/theme';
+export default function LessonPage() {
+ const params = useLocalSearchParams<{id:string}>(); const p = useLessons(params.id);
+ return <Screen detail><ScrollView style={layout.list} contentContainerStyle={[layout.content,s.content]} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled"><View style={s.heading}><View style={ui.row}><BookOpen size={18} color={t.colors.citrus}/><Text style={ui.label}>FREE LESSON · {p.lesson.minutes} MIN</Text></View><Text style={s.title}>{p.lesson.title}</Text><Text style={s.subtitle}>{p.lesson.subtitle}</Text></View>{p.lesson.body.map((paragraph,index) => <Text key={index} style={ui.body}>{paragraph}</Text>)}<View style={s.practice}><Text style={ui.label}>ONE SMALL PRACTICE</Text><Text style={s.practiceTitle}>Try this in your kitchen</Text><Text style={ui.body}>{p.lesson.practice}</Text></View><View style={ui.gap}><View style={ui.row}><PencilLine size={20} color={t.colors.primary}/><Text style={s.practiceTitle}>A moment to reflect</Text></View><Text style={ui.body}>{p.lesson.prompt}</Text><Field label="Your private device draft" value={p.note} onChangeText={p.setNote} multiline maxLength={5000} placeholder="A thought, a small win, something to try…" style={s.reflection}/><Text accessibilityLiveRegion="polite" style={ui.subtle}>{p.storageError ? 'Draft is only held in this session.' : 'Draft autosaves on this device. Never uploaded.'}</Text></View><Button title={p.complete ? 'Completed · mark as unfinished' : 'Complete this lesson'} onPress={() => p.toggleLesson(p.lesson.id)} icon={<Check size={20} color={t.colors.surface}/>}/><Note/></ScrollView></Screen>;
+}
+const s = StyleSheet.create({content:{paddingTop:t.space.lg},heading:{gap:t.space.md},title:{fontFamily:t.fonts.heading,fontSize:34,lineHeight:44,color:t.colors.primary},subtitle:{fontFamily:t.fonts.body,fontSize:18,lineHeight:28,color:t.colors.subtle},practice:{padding:t.space.lg,backgroundColor:t.colors.soft,borderRadius:t.radius.md,gap:t.space.md},practiceTitle:{fontFamily:t.fonts.heading,fontSize:22,color:t.colors.primary},reflection:{minHeight:170}});

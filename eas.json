@@ -1,0 +1,9 @@
+{
+  "cli": { "version": ">= 16.0.0", "appVersionSource": "remote" },
+  "build": {
+    "development": { "developmentClient": true, "distribution": "internal", "env": { "ORCHARD_RELEASE_BUILD": "false" } },
+    "preview": { "distribution": "internal", "env": { "ORCHARD_RELEASE_BUILD": "false" }, "android": { "buildType": "apk" } },
+    "production": { "autoIncrement": true, "env": { "ORCHARD_RELEASE_BUILD": "true" }, "android": { "buildType": "app-bundle" } }
+  },
+  "submit": { "production": {} }
+}

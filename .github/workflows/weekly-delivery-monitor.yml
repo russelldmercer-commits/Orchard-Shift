@@ -1,0 +1,21 @@
+name: Weekly meal delivery monitor
+on:
+  schedule:
+    - cron: '0 8 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  availability:
+    if: vars.ORCHARD_MONITOR_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verify current weekly meal delivery remains ready
+        run: |
+          curl --fail --silent --show-error --max-time 30 \
+            -H 'Content-Type: application/json' \
+            --data '{"action":"availability"}' \
+            'https://gomqzwxyzxyccxodgomq.backend.onspace.ai/functions/v1/app-weekly-meals' \
+            | jq --exit-status '.ready == true'
+# A failed run notifies subscribed repository owners. No payment API, secret, customer or meal records are requested.
