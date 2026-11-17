@@ -12,7 +12,7 @@ export function useAccountDeletion() {
   const [busy, setBusy] = useState(false); const [error, setError] = useState(''); const [deleted, setDeleted] = useState(false);
   const lock = useRef(false); const mounted = useRef(true); const owner = useRef(auth.user?.id); owner.current = auth.user?.id;
   useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
-  useEffect(() => { setPassword(''); setConfirmed(false); }, [auth.user?.id]);
+  useEffect(() => { setPassword(''); setConfirmed(false); setError(''); if (auth.user) setDeleted(false); }, [auth.user?.id]);
   const remove = useCallback(async () => {
     const ownerId = auth.user?.id;
     if (!ownerId || lock.current || !confirmed || password.length < 6) return;
@@ -24,9 +24,10 @@ export function useAccountDeletion() {
       if (result.error) { setError(result.error); return; }
       let warning = '';
       try { await orchard.eraseDeviceData(); } catch { warning = 'The cloud account was deleted, but device storage could not be erased. Clear app data in your device settings before sharing this device.'; }
-      const sessionError = await clearDeletedSession();
-      if (mounted.current) { setDeleted(true); setError(warning || sessionError || ''); }
-    } catch { if (mounted.current) setError('Deletion could not be confirmed. Please retry.'); }
+      if (!mounted.current || owner.current !== ownerId) return;
+      const sessionError = await clearDeletedSession(ownerId);
+      if (mounted.current && (!owner.current || owner.current === ownerId)) { setDeleted(true); setError(warning || sessionError || ''); }
+    } catch { if (mounted.current && owner.current === ownerId) setError('Deletion could not be confirmed. Please retry.'); }
     finally { lock.current = false; if (mounted.current) setBusy(false); }
   }, [auth.user?.id, confirmed, password, orchard.eraseDeviceData]);
   const confirmDelete = useCallback(() => showAlert('Permanently delete account?', 'Your account, profile, membership mapping, and device-saved food data will be removed. Apple/Google billing must be cancelled in store settings; deletion does not issue a refund.', [

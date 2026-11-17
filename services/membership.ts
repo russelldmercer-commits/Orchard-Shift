@@ -47,7 +47,8 @@ export async function fetchMembership(expectedOwnerId?: string): Promise<Service
   const result = await invokeBilling<MembershipStatus>(native ? 'app-native-subscription' : 'app-check-subscription', native ? { platform: Platform.OS } : {}, expectedOwnerId);
   if (result.error || !result.data) return result;
   const status = result.data;
-  if (typeof status.subscribed !== 'boolean' || typeof status.entitled !== 'boolean' || !['test','live'].includes(status.billing_mode) || status.amount !== 1299 || status.currency !== 'usd' || status.interval !== 'month' || (native && status.provider !== 'revenuecat') || (status.billing_mode === 'test' && status.entitled)) return { data: null, error: 'The membership response could not be verified.' };
+  const validEnd = typeof status.subscription_end === 'string' && Number.isFinite(Date.parse(status.subscription_end));
+  if (typeof status.subscribed !== 'boolean' || typeof status.entitled !== 'boolean' || typeof status.status !== 'string' || !/^[a-z_]{1,40}$/.test(status.status) || typeof status.checkout_ready !== 'boolean' || typeof status.has_customer !== 'boolean' || typeof status.cancel_at_period_end !== 'boolean' || (status.tier !== null && typeof status.tier !== 'string') || (status.subscription_end !== null && !validEnd) || !['test','live'].includes(status.billing_mode) || status.amount !== 1299 || status.currency !== 'usd' || status.interval !== 'month' || (native && (status.provider !== 'revenuecat' || ![null, 'app_store', 'play_store'].includes(status.store ?? null) || (status.subscribed && (!validEnd || !status.store || !status.has_customer)))) || (status.billing_mode === 'test' && status.entitled) || (status.entitled && !status.subscribed)) return { data: null, error: 'The membership response could not be verified.' };
   return result;
 }
 export async function createBillingUrl(type: 'checkout' | 'portal', platform: string): Promise<ServiceResult<{url: string}>> {

@@ -14,7 +14,7 @@ You do **not** need Apple or Google developer accounts for these tests. You do n
 6. Open the newest run and wait for both jobs, **offline-security** and **types**, to finish.
 7. A green run means these code checks passed for that commit. If a job is red, open it, expand the failed step and send the error text or a screenshot here. Do not send credentials or your `.env` file.
 
-These checks test request/identity validation, secret-response rejection, membership expiry/sandbox handling, weekly content and release guards, TypeScript, and the Expo configuration loader. They do not purchase a subscription, delete an account, approve policies, or prove store readiness.
+These checks test request/identity validation, secret-response rejection, membership expiry/sandbox handling, weekly content and release guards, chosen-recipe shopping totals and preference matching, bounded asynchronous customer-cleanup confirmation, TypeScript, and the Expo configuration loader. They do not purchase a subscription, delete an account, approve policies, or prove store readiness.
 
 ## 2. Check the deployed public pages
 

@@ -41,12 +41,12 @@ Policies describe device storage (not an encrypted vault), optional age/weight, 
 
 ## Publish weekly meals
 1. Cloud → Data → `weekly_meal_releases`: open the separate `test` draft first.
-2. Review every recipe, all ingredients, allergens, safe cooking instructions, portions and estimated nutrients. `week_of` must be the current Monday in UTC. Each day 0–6 requires Breakfast, Lunch and Dinner; recipe IDs must be unique. Up to 42 recipes permit alternatives. Shopping totals use the first recipe per day/slot, as explained in the app.
+2. Review every recipe, all ingredients, allergens, safe cooking instructions, portions and estimated nutrients. `week_of` must be the current Monday in UTC. Each day 0–6 requires Breakfast, Lunch and Dinner; recipe IDs must be unique. Up to 42 recipes permit alternatives. The first recipe per day/slot is the default plan. Members may choose another published option for that same day/slot; shopping totals use the selected recipes and their servings, excluding unselected alternatives. Checkmarks reset when a planned recipe or its servings change.
 3. Replace draft summary/reviewer labels with genuine editorial metadata. Record `reviewed_at` only after review and `published_at` as the actual publication time, not an invented/future approval.
 4. Test a separately published sandbox collection with an installed-build sandbox subscription. Publish the reviewed `live` row when ready. Sandbox membership never authorizes live recipes.
 5. Prepare a distinct collection in advance for each new Monday UTC. Stale, unreviewed, incomplete and future collections are rejected rather than relabelled as new.
 
-RLS permits no direct client access to weekly releases. Every protected read verifies native membership on the server. Personal food/health preferences are not uploaded. Downloaded collections are memory-only and hidden on account changes. Visibility also requires a successful server membership check less than 90 seconds old, matching test/live mode and an unexpired subscription. Refund/inactive status, provider failures and expired verification hide the collection; a device cache never grants membership.
+RLS permits no direct client access to weekly releases. Every protected read verifies native membership on the server. Personal food/health preferences are not uploaded. Downloaded collections, meal selections, serving adjustments and weekly shopping checkmarks are memory-only and account/collection-scoped. They are hidden and cleared on account changes or lost access. Preferences flag specific ingredient matches locally and rank available options; they do not invent alternatives or promise allergy safety. Membership responses also use account-generation guards to reject earlier requests even after A → B → A switching. Visibility also requires a successful server membership check less than 90 seconds old, matching test/live mode and an unexpired subscription. Refund/inactive status, provider failures and expired verification hide the collection; a device cache never grants membership.
 
 Arrange ongoing review, delivery monitoring and support. Late meals pause new app purchases, not existing store renewals.
 
@@ -65,7 +65,7 @@ Store membership requires matching allowlisted product/store/base plan, an unref
 - In app: You → Delete my account, also accessible from Help & support.
 - Public: the HTTPS password-verified deletion form works without reinstalling the app.
 - The private endpoint requires JWT and fresh password verification against the server-derived account email. It accepts only password and `DELETE` confirmation; account/customer IDs are rejected. Requests are bounded; errors are static; passwords/tokens are not logged or saved.
-- It removes the dedicated RevenueCat customer, then hard-deletes the Cloud account. Profile, APP customer mapping and pending marker cascade away. In-app deletion erases this device's saved food data and clears the local session. Public deletion explains that local data on each device must be cleared separately.
+- It requests dedicated RevenueCat customer deletion and requires a 404 absence confirmation before hard-deleting the Cloud account. RevenueCat 200 responses can mean queued cleanup; bounded DELETE retries preserve the pending marker if not yet confirmed. It never polls the GET endpoint, which can recreate customers. Profile, APP customer mapping and pending marker cascade away. In-app deletion erases this device's saved food data and clears the local session. Public deletion explains that local data on each device must be cleared separately.
 - Apple/Google billing does not automatically stop. Store settings are offered before immediate deletion; cancellation is not a prerequisite. No automatic store refund is issued. Dedicated browser APP subscriptions are cancelled without proration/refund only after exclusive APP ownership verification; website/mixed subscriptions are not cancelled.
 - Failed cleanup leaves a pending marker that blocks membership/new purchases while the account can retry. Deletion is never reported as complete until confirmed. Processor transaction records and minimal APP metadata may remain under provider retention policies.
 
@@ -87,10 +87,12 @@ deno test --no-config --no-remote \
   supabase/functions/_shared/nativeEntitlement.test.ts \
   supabase/functions/_shared/releaseSafety.test.ts \
   supabase/functions/_shared/weeklyAccess.test.ts \
-  supabase/functions/_shared/nativeRequestLimits.test.ts
+  supabase/functions/_shared/nativeRequestLimits.test.ts \
+  supabase/functions/_shared/weeklyMealPlan.test.ts \
+  supabase/functions/_shared/nativeCustomerCleanup.test.ts
 ```
 
-These cover auth/identity boundaries, secret-response denial, native entitlement and sandbox isolation, current-week content, deletion inputs, release metadata, cached-content expiry/staleness and request size limits. They do not exercise live payment or deletion APIs. Existing invoice tests import Stripe and remain separately available, outside this no-remote job.
+These cover auth/identity boundaries, secret-response denial, native entitlement and sandbox isolation, current-week content, deletion inputs, release metadata, cached-content expiry/staleness, request size limits, selected-recipe shopping totals and asynchronous native-customer deletion confirmation. They do not exercise live payment or deletion APIs. Existing invoice tests import Stripe and remain separately available, outside this no-remote job.
 
 GitHub **Release safety checks** runs after a commit to a connected repository. It runs offline fixtures, TypeScript and actual Expo-loader regression tests. Build tests use synthetic metadata/flags to verify both production entry points, every missing attestation, invalid contact/identifier/URLs and server-secret exclusion; they never alter Cloud approval. Require a passing release-branch run and retain evidence.
 

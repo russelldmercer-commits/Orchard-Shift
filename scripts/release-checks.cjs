@@ -2,7 +2,7 @@
 const { spawnSync } = require('node:child_process');
 const path = require('node:path');
 const root = path.resolve(__dirname, '..');
-const files = ['nativeBillingRequest', 'nativeBillingResponse', 'nativeEntitlement', 'releaseSafety', 'weeklyAccess', 'nativeRequestLimits'].map(name => `supabase/functions/_shared/${name}.test.ts`);
+const files = ['nativeBillingRequest', 'nativeBillingResponse', 'nativeEntitlement', 'releaseSafety', 'weeklyAccess', 'nativeRequestLimits', 'weeklyMealPlan', 'nativeCustomerCleanup'].map(name => `supabase/functions/_shared/${name}.test.ts`);
 function run(label, command, args) {
   console.log(`CHECK: ${label}`);
   const result = spawnSync(command, args, { cwd: root, stdio: 'inherit', timeout: 600000 });

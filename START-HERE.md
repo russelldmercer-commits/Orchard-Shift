@@ -1,68 +1,54 @@
-# Orchard Shift: your next steps
+# Orchard Shift: what Russell needs to do
 
-The app is **not approved for publishing yet**. Development safeguards are in place; no automated run, signed build or store transaction has been verified in this session. Do these steps in order. Do not set approval flags to skip a step.
+The app has meal tools, preferences, servings, lessons, membership screens, published-weekly-meal selection, linked shopping checklists, support/policy pages and account deletion. New purchases and production builds remain blocked until release requirements are met. Automated tests and installed-device/store tests have not been run or verified here.
 
-## 1. Your details are recorded; run the code checks now
-- Public operator: Russell Mercer.
-- Public support/privacy email: russellmercer047@gmail.com.
-- Apple Developer account: not yet registered.
-- Google Play Console account: not yet registered.
+Your public operator details are recorded: **Russell Mercer**, **russellmercer047@gmail.com**. Keep this inbox monitored. No passwords, private keys or identity documents should be sent in chat.
 
-The supplied name and email are now defaults in the app build and server public-information code; existing environment overrides still take precedence. This does not mark policies as reviewed or approve publishing. Verify the address receives support mail and review the policy wording.
+## 1. Create the developer accounts
 
-Open `TESTING-GUIDE.md` for click-by-click instructions. Start with OnSpace → GitHub → sync/commit changes → repository Actions → Release safety checks → Run workflow. These code checks need no Apple/Google developer account and do not charge customers. Their results have not been verified here.
+You currently have neither account. Complete enrollment yourself:
+- Apple: https://developer.apple.com/programs/enroll/ — normally $99 USD/year; local charges vary.
+- Google: https://play.google.com/console/signup — $25 USD once; local charges may apply.
 
-Do not send passwords, payment keys or signing credentials in chat. Owner name and support email are public information.
+After approval, tell me **Apple enrolled / Google enrolled**. Confirm the iOS Bundle ID and Android package name from the app records/builds; do not invent replacements for existing apps. New personal Google accounts also require at least 12 testers continuously opted in to a closed test for 14 days, followed by an application for production access. Recruit testers while enrollment is pending.
 
-## 2. Create developer accounts, then confirm store identities and monthly products
-Enroll through https://developer.apple.com/programs/enroll/ and https://play.google.com/console/signup. Apple membership is normally $99 USD per year; Google registration is $25 USD once (local charges may vary). A new personal Google account also requires a closed test with at least 12 continuously opted-in testers for 14 days before applying for production access. Internal subscription testing alone does not satisfy this launch requirement.
+## 2. Run the code checks while enrollment is pending
 
-If you have existing app records, send their **Bundle ID** (Apple) and **package name** (Google). Otherwise, register the app in your own store accounts first; do not substitute identifiers for an existing app.
+The app files are already in OnSpace; you do not need to write or copy code into chat. Connect the **GitHub** button in OnSpace's top-right toolbar, save/sync this project to your repository, then open that repository → **Actions** → **Release safety checks** → **Run workflow**.
 
-In RevenueCat, connect the matching Apple/Google apps and real store credentials. Set up:
-- Apple: `orchard_shift_monthly`, auto-renewing, one month, $12.99 USD.
-- Google: `orchard_shift_monthly`, base plan `monthly`, one month, $12.99 USD.
-- Entitlement: `orchard_shift_membership`.
-- Current offering: the Monthly package with the correct product for each store.
-- Restore behavior: **Keep with original App User ID**.
+If the integration or a source-repository URL prompt is unclear, send a screenshot with credentials hidden instead of guessing. If a test is red, send its failed-step error. These checks need no developer account and make no payment/deletion requests. Green confirms code checks for that commit, not permission to publish. More instructions: `TESTING-GUIDE.md`.
 
-Keep the app download free; the $12.99 charge is the monthly subscription. Complete the stores' agreements, tax/banking and signing requirements. Details are in `BILLING-SETUP.md`.
-
-## 3. Review and publish meals; review policies
-Cloud → Data → `weekly_meal_releases`: review the separate test draft first. Check all 21 meals, ingredients, allergens, safe cooking instructions and estimated nutrition; obtain qualified review where needed. Record the genuine reviewer and timestamps only after review.
-
-Publish test content for installed-build testing. Publish the reviewed live collection for the current UTC Monday week when ready. Old drafts cannot be relabelled as a new weekly benefit. Arrange a genuinely new reviewed collection every Monday and someone to handle delivery failures.
-
-Review `supabase/functions/_shared/legalInformation.ts` for your actual business and release regions. Public pages remain unavailable until real operator/contact settings are configured. They are drafts, not legal certification.
-
-## 4. Run the supplied checks
-Connect/commit to GitHub and open Actions → **Release safety checks**. Require a passing run. This checks offline fixtures, TypeScript and the actual Expo config loader, including each production-build guard.
-
-Alternatively, after installing project dependencies, Node 22 and Deno:
+Without GitHub, download the complete source, install Node 22 and Deno, open a terminal in the folder containing `package.json`, then run:
 ```sh
+npm install --ignore-scripts
 node scripts/release-checks.cjs
 ```
 
-After verifying the changed Edge Functions are deployed with the confirmed public contact details, run Actions → **Public release deployment checks**, leaving `require_ready` off initially; or:
-```sh
-node scripts/release-smoke.cjs
-```
+## 3. Review the meals and policies
 
-This checks public policies/support/deletion pages, secret-pattern denial and anonymous/caller-selected-identity rejection for weekly meals. It does not purchase anything or delete an account. If the gateway requires an API key, use only the project's **public anon key** as GitHub variable `ORCHARD_PUBLIC_ANON_KEY`; never put payment/service-role keys in this workflow.
+Cloud → Data → `weekly_meal_releases`: inspect the draft rows. Their original dates may now be stale. Prepare a genuinely current seven-day collection rather than relabelling an old week. Review ingredients, allergens, cooking safety, portions and estimated nutrients; obtain qualified review where needed. Record the real reviewer and review/publication times only after review. Publish separate test content first, then the reviewed live collection when ready.
 
-A failed check is a blocker, not an approval. Source files being saved does not prove they passed. Cloud table RLS was inspected read-only during development and is enabled for all four relevant tables; this does not replace testing actual access policies.
+Provide a genuinely new reviewed collection every Monday UTC. The app does not invent paid meals or mark them reviewed for you. Defaults use one recipe per day/meal; published alternatives can replace that recipe, with shopping totals following the actual selection and servings.
 
-## 5. Test installed builds and complete store forms
-Use Apple sandbox/TestFlight and Google's signed internal-testing track with license testers. On **both** platforms verify purchase, cancel/pending, restore, renewal, expiry/refund, account switching, offline/provider errors, and cancellation settings. Use disposable accounts to test actual in-app/public account deletion and retries. Preview is not sufficient.
+Review `supabase/functions/_shared/legalInformation.ts` for your actual business and release regions. Verify the public privacy, terms, support and deletion pages listed in `BILLING-SETUP.md` work without login and show your contact details. Draft wording is not legal certification.
 
-Also check narrow phones/tablets, landscape, large text, screen readers, keyboard/OTP/recovery and local meals/groceries. Complete Apple privacy/review forms and Google Data Safety, external deletion URL and **Nutrition and Weight Management** health declaration. The full test checklist is in `RELEASE-CHECKLIST.md`.
+## 4. Configure subscriptions and test installed builds
 
-## 6. Approve and publish only after evidence is complete
-Only then supply real build identifiers/operator metadata and set each named build attestation in `RELEASE-CHECKLIST.md`. Cloud and build environments are separate. Enable server `ORCHARD_RELEASE_APPROVED=true` only after reviewed current live meals and all release checks are complete.
+In the stores and RevenueCat, configure the matching registered apps, real store credentials, original-account restore behavior, and these products:
+- Apple monthly subscription: `orchard_shift_monthly`, one month, $12.99 USD.
+- Google subscription: `orchard_shift_monthly`, monthly base plan `monthly`, $12.99 USD.
+- RevenueCat entitlement: `orchard_shift_membership`; current offering's Monthly package uses the appropriate store product.
 
-Run the final public check with readiness required:
-```sh
-node scripts/release-smoke.cjs --require-ready
-```
+Keep the app download free. Complete store agreements, tax/banking and signing. Credentials stay in dashboards/Edge Functions, not source or chat. Follow `BILLING-SETUP.md`.
 
-Build production and submit using Publish. Enable the weekly delivery monitor in GitHub (`ORCHARD_MONITOR_ENABLED=true`) and subscribe to failures. Neither the monitor nor the purchase gate automatically stops existing store renewals if meals are late.
+Verify the changed Cloud functions are deployed, then run GitHub **Public release deployment checks** with `require_ready` unchecked. Test purchase, cancellation, pending payment, restore, renewal/expiry/refund, account switching, offline failures and deletion using disposable accounts on both installed platforms. Apple sandbox/TestFlight and Google's signed testing track/license testers are needed; Live Preview cannot verify purchasing.
+
+For weekly test collections, verify meal replacements and serving changes update shopping totals and checkmarks. Test queued RevenueCat cleanup and password-verified retries: a queued deletion is not reported as complete. Full cases: `RELEASE-CHECKLIST.md`.
+
+## 5. Complete store forms, then publish
+
+Complete privacy/Data Safety, app access, content/age ratings, screenshots, subscription disclosures and Google's Nutrition and Weight Management health declaration. Finish the required closed testing for a new personal Google account.
+
+Only after passing checks, reviewed current meals/policies and successful signed-build tests should the named build attestations and Cloud release approval be enabled. Do not turn on flags to skip the work. Run the final readiness check, build production and use OnSpace **Publish**. `RELEASE-CHECKLIST.md` contains the exact guard settings.
+
+Keep reviewing/delivering weekly meals and monitoring failures after launch. Pausing new purchases does not stop existing store renewals.

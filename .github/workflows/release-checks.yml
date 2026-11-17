@@ -27,6 +27,8 @@ jobs:
           supabase/functions/_shared/releaseSafety.test.ts
           supabase/functions/_shared/weeklyAccess.test.ts
           supabase/functions/_shared/nativeRequestLimits.test.ts
+          supabase/functions/_shared/weeklyMealPlan.test.ts
+          supabase/functions/_shared/nativeCustomerCleanup.test.ts
   types:
     runs-on: ubuntu-latest
     timeout-minutes: 15

@@ -2,6 +2,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.2';
 import { corsHeaders, jsonResponse } from './cors.ts';
 import { validateDeletionBody } from './accountDeletion.ts';
 import { cloudAdmin } from './weeklyMealRuntime.ts';
+import { confirmNativeCustomerRemoval } from './nativeCustomerCleanup.ts';
 import { billingContext, appSubscriptions, appPriceId, appProductId } from './appBilling.ts';
 async function removeBrowserBilling(req: Request, ownerId: string) {
   const { data: mapping, error } = await cloudAdmin().from('membership_customers').select('stripe_customer_id').eq('user_id', ownerId).maybeSingle();
@@ -20,8 +21,16 @@ async function removeBrowserBilling(req: Request, ownerId: string) {
 async function removeNativeCustomer(ownerId: string) {
   const key = Deno.env.get('REVENUECAT_SECRET_API_KEY');
   if (!key) throw new Error('cleanup_not_configured');
-  const response = await fetch(`https://api.revenuecat.com/v1/subscribers/${encodeURIComponent(ownerId)}`, { method: 'DELETE', headers: { Authorization: `Bearer ${key}` }, signal: AbortSignal.timeout(12000) });
-  if (!response.ok && response.status !== 404) throw new Error('provider_cleanup_failed');
+  const removed = await confirmNativeCustomerRemoval({
+    erase: async () => {
+      const response = await fetch(`https://api.revenuecat.com/v1/subscribers/${encodeURIComponent(ownerId)}`, { method: 'DELETE', headers: { Authorization: `Bearer ${key}` }, signal: AbortSignal.timeout(8000) });
+      const status = response.status;
+      if (response.body) { try { await response.body.cancel(); } catch { /* Provider bodies are never returned or logged. */ } }
+      return status;
+    },
+    wait: milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds)),
+  });
+  if (!removed) throw new Error('provider_cleanup_pending');
 }
 export async function handleDeleteAccount(req: Request): Promise<Response> {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
@@ -49,7 +58,7 @@ export async function handleDeleteAccount(req: Request): Promise<Response> {
     await removeNativeCustomer(data.user.id);
     const removed = await admin.auth.admin.deleteUser(data.user.id, false);
     if (removed.error) throw new Error('auth_deletion_failed');
-    // Cloud profile, membership mapping and pending deletion marker cascade away.
+    // Native absence was confirmed before final Cloud removal; related rows cascade away.
     return jsonResponse({ deleted: true });
   } catch { return jsonResponse({ error: 'Deletion could not be completed. Some cleanup may already be complete. Retry this request; membership access is blocked if deletion has started.' }, 503); }
 }

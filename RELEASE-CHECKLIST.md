@@ -5,7 +5,8 @@ For short, ordered instructions, start with `START-HERE.md`; for running checks,
 ## Completed in code and Cloud
 - Native purchase/restore implementation, platform public-key guards, size-bounded native requests and server entitlement verification.
 - Downloaded paid recipes are hidden after expiry, refund/inactive status, failed/stale verification or a mismatched test/live membership; no device cache grants access.
-- Weekly member recipe screen with serving scaling and shopping totals; live/test content isolation and server checks on every paid-content read.
+- Weekly member recipe screen with selection of published alternatives, local ingredient preference warnings, serving scaling and a shopping checklist linked to the chosen recipes; live/test isolation and server checks on every paid-content read.
+- Account-generation guards reject superseded membership responses; bounded native customer cleanup requires confirmed absence before reporting final Cloud account deletion.
 - Current-week content validation and new-purchase pause while release requirements are incomplete.
 - 21 newly authored recipes drafted in Cloud, separately for live and sandbox review. Read-only SQL confirmed both rows are **unreviewed and unpublished**.
 - Password-verified account deletion in the app and through a public HTTPS form; profile/mapping/pending-marker cleanup, store cancellation warnings, retryable provider cleanup and device-data erasure.
@@ -53,7 +54,7 @@ Subscribe to GitHub workflow failure notifications and enable the optional weekl
 ### 5. Finish store disclosures and installed-build review
 Complete Apple App Privacy, age rating, subscription disclosures, review access and screenshots; and Google Data Safety, account-deletion URL, content rating, app access and the **Nutrition and Weight Management** Health apps declaration. Do not claim no data collection: account, purchase and SDK/provider data are processed off-device. Optional age/weight and reflections are device-local in this implementation, not uploaded by billing.
 
-Inspect SDK privacy manifests/required-reason API declarations and the current store-required Expo/native SDK target levels in the generated builds. Check the generated icon and store-specific screenshots on devices. Test narrow phones, tablets, landscape, text sizing, screen readers, keyboard behavior, local progress/servings/groceries, OTP login/recovery and deletion. Do not advertise clinical outcomes, allergy guarantees or unimplemented features.
+Inspect SDK privacy manifests/required-reason API declarations and the current store-required Expo/native SDK target levels in the generated builds. Check the generated icon and store-specific screenshots on devices. Test narrow phones, tablets, landscape, text sizing, screen readers, keyboard behavior, local progress/servings/groceries, OTP login/recovery and deletion. For a test weekly collection with genuinely reviewed alternatives, verify switching the chosen recipe updates shopping ingredients/quantities, planned-serving changes reset checkmarks, unselected options are not counted, preferences flag rather than remove ingredients, and A → B → A account switching cannot reveal earlier responses. Verify queued native-customer cleanup stays pending until absence is confirmed. Do not advertise clinical outcomes, allergy guarantees or unimplemented features.
 
 ## Production guard — not a substitute for the checks
 `app.config.ts` blocks builds when `ORCHARD_RELEASE_BUILD=true` or `EAS_BUILD_PROFILE=production` unless real identifiers, valid public operator metadata and all attestations exist. `eas.json` sets that flag in its production profile and increments release versions. The app never bundles billing secrets.

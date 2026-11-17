@@ -10,7 +10,7 @@ export default function LoginPage() {
   const p = useAccountForm();
   const router = useRouter();
   const signedIn = Boolean(p.user && (p.mode !== 'recovery' || p.recovered));
-  return <Screen title={p.title} subtitle="Your free food tools stay on this device."><ScrollView style={layout.list} contentContainerStyle={layout.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+  return <Screen fullScreen title={p.title} subtitle="Your free food tools stay on this device."><ScrollView style={layout.list} contentContainerStyle={layout.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
     <View style={s.intro}><ShieldCheck size={28} color={t.colors.primary}/><Text style={s.heading}>Your Orchard Shift account.</Text><Text style={ui.body}>Sign in to keep your weekly meal membership with your account and restore store purchases. Starter meal plans, personal preferences and reflections stay on this device.</Text></View>
     {signedIn ? <View style={s.form}><Text style={s.heading}>You are signed in</Text><Text style={ui.body}>{p.user?.email}</Text>{p.notice ? <Text accessibilityLiveRegion="polite" style={ui.body}>{p.notice}</Text> : null}<Button title="View membership" onPress={() => router.push('/membership')}/><Text style={ui.subtle}>Your device-saved reflections and food preferences are not uploaded.</Text></View> : <View style={s.form}>
       <View style={s.modes}><Chip title="Sign in" selected={p.mode === 'login'} onPress={() => p.changeMode('login')}/><Chip title="Create account" selected={p.mode === 'signup'} onPress={() => p.changeMode('signup')}/><Chip title="Recover" selected={p.mode === 'recovery'} onPress={() => p.changeMode('recovery')}/></View>
